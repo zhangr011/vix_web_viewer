@@ -1,3 +1,4 @@
+/data/data.ini
 /logs
 flask.out
 flask_monitor.pid

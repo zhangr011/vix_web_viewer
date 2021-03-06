@@ -14,6 +14,21 @@ from options_monitor.data_ref import \
     PRODUCT_GROUP_NAME, FUTURE_HV_NAMES_REVERSE, \
     IV_NAME, OPEN_INTEREST_NAME, HV_20_NAME, HV_250_NAME, CLOSE_PRICE_NAME, VOLUME_NAME
 
+import configparser
+ini_config = configparser.ConfigParser()
+DATA_CONFIG_PATH = './data/data.ini'
+DATA_SECTION = 'data'
+ini_config.read(DATA_CONFIG_PATH)
+
+# data path
+OPTIONS_DATA_PATH = ini_config.get(DATA_SECTION, 'options_monitor')
+CBOE_DATA_PATH = ini_config.get(DATA_SECTION, 'cboe_vix_gvz_ovx_monitor')
+
+
+# set the data path
+from options_monitor.data_ref import set_data_root as options_set_data_root
+options_set_data_root(OPTIONS_DATA_PATH)
+
 import pandas as pd
 
 
