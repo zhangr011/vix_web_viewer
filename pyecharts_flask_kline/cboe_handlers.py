@@ -8,7 +8,7 @@ from pyecharts.charts import Line, Bar, Grid
 from flask import render_template
 
 from cboe_monitor.data_manager import VIXDataManager, GVZDataManager, OVXDataManager
-from cboe_monitor.utilities import run_over_time_frame
+from cboe_monitor.utilities import run_over_time_frame, CLOSE_PRICE_NAME
 
 
 #----------------------------------------------------------------------
@@ -28,23 +28,47 @@ def get_vix_info():
 
 #----------------------------------------------------------------------
 def line(df, rets_vix, rets_gvzm, rets_ovxm):
-    light_area_opt = opts.AreaStyleOpts(opacity = 0.05)
+    # line the vix
+    FLINE_OPT = opts.LineStyleOpts(opacity = 1, width = 1.5)
+    OLINE_OPT = opts.LineStyleOpts(opacity = 0.9, width = 1.2, type_ = 'dashed')
     line = (Line()
             .add_xaxis(xaxis_data = df.index)
-            .add_yaxis("0", df[0], is_symbol_show = False,
+            .add_yaxis("vix", df[0], is_symbol_show = False,
                        areastyle_opts = opts.AreaStyleOpts(opacity = 0.2),
+                       linestyle_opts = FLINE_OPT,
                        markline_opts = opts.MarkLineOpts(
                            data = [
                                opts.MarkLineItem(type_ = "min", name = "ivl"),
                                opts.MarkLineItem(type_ = "max", name = "ivh"),
                            ]
-                       ),
-            ).add_yaxis("1", df[1], is_symbol_show = False)
-            .add_yaxis("2", df[2], is_symbol_show = False, is_selected = False)
-            .add_yaxis("3", df[3], is_symbol_show = False)
-            .add_yaxis("4", df[4], is_symbol_show = False, is_selected = False)
-            .add_yaxis("5", df[5], is_symbol_show = False)
-            .set_series_opts(
+                       ))
+            .add_yaxis('gvz', rets_gvzm['gvz'][CLOSE_PRICE_NAME],
+                       is_symbol_show = False, linestyle_opts = FLINE_OPT,
+                       markline_opts = opts.MarkLineOpts(
+                           data = [
+                               opts.MarkLineItem(type_ = "min", name = "ivl"),
+                               opts.MarkLineItem(type_ = "max", name = "ivh"),
+                           ]
+                       ))
+            .add_yaxis('ovx', rets_ovxm['ovx'][CLOSE_PRICE_NAME],
+                       is_symbol_show = False, linestyle_opts = FLINE_OPT,
+                       markline_opts = opts.MarkLineOpts(
+                           data = [
+                               opts.MarkLineItem(type_ = "min", name = "ivl"),
+                               opts.MarkLineItem(type_ = "max", name = "ivh"),
+                           ])
+            )
+            .add_yaxis("1", df[1], is_symbol_show = False,
+                       linestyle_opts = OLINE_OPT)
+            .add_yaxis("2", df[2], is_symbol_show = False,
+                       linestyle_opts = OLINE_OPT, is_selected = False)
+            .add_yaxis("3", df[3], is_symbol_show = False,
+                       linestyle_opts = OLINE_OPT)
+            .add_yaxis("4", df[4], is_symbol_show = False,
+                       linestyle_opts = OLINE_OPT, is_selected = False)
+            .add_yaxis("5", df[5], is_symbol_show = False,
+                       linestyle_opts = OLINE_OPT
+            ).set_series_opts(
                 label_opts = opts.LabelOpts(is_show = False)
             ).set_global_opts(
                 title_opts = opts.TitleOpts(title = "vix", pos_left = "0"),
