@@ -4,3 +4,4 @@ flask.out
 flask_monitor.pid
 /pyecharts_flask_kline/logs/
 /pyecharts_flask_kline/data/
+__pycache__
