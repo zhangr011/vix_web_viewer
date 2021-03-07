@@ -8,14 +8,14 @@ from pyecharts.charts import Line, Bar, Grid
 from flask import render_template
 
 from cboe_monitor.data_manager import VIXDataManager, GVZDataManager, OVXDataManager
-from cboe_monitor.utilities import run_over_time_frame, CLOSE_PRICE_NAME
+from cboe_monitor.utilities import run_over_time_frame, CLOSE_PRICE_NAME, get_last_day
 
 
 #----------------------------------------------------------------------
 @lru_cache
-def get_vix_info():
+def get_vix_info(last_date):
     # query data from the data manager
-    # param date is for lru_cache only
+    # param last_date is for lru_cache only
     delivery_dates, schedule_days = run_over_time_frame()
     vdm = VIXDataManager(delivery_dates)
     df = vdm.combine_all(24)
@@ -33,7 +33,7 @@ def get_vix_info():
     df = df.join(vix_diff)
     df = df.join(df_gvz)
     df = df.join(df_ovx)
-    return df
+    return df, delivery_dates
 
 
 #----------------------------------------------------------------------
@@ -139,7 +139,7 @@ def get_template():
 
 #----------------------------------------------------------------------
 def get_data():
-    delivery_dates, schedule_days = run_over_time_frame()
-    df = get_vix_info()
+    last_day = get_last_day()
+    df, delivery_dates = get_vix_info(last_day)
     chart = line(delivery_dates, df)
     return chart.dump_options_with_quotes()
