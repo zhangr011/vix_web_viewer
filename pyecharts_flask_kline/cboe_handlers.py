@@ -50,6 +50,13 @@ def get_warning_areas(df):
             warning = False
             areas.append((start, date))
             start = None
+    # close the last area
+    if start is not None:
+        last_date = df.index[-1]
+        if start == last_date:
+            # move the last date to the previous
+            start = df.index[-2]
+        areas.append((start, last_date))
     return areas
 
 #----------------------------------------------------------------------
@@ -102,7 +109,7 @@ def line(delivery_dates, df):
                 markarea_opts = opts.MarkAreaOpts(
                     is_silent = True,
                     data = [opts.MarkAreaItem(name = "warn", x=(xs, xe)) for xs, xe in warning_areas],
-                    itemstyle_opts = opts.ItemStyleOpts(opacity = 0.2, color = '#FFA54F33')
+                    itemstyle_opts = opts.ItemStyleOpts(color = '#FFA54F10')
                 ))
             .set_global_opts(
                 title_opts = opts.TitleOpts(title = "vix", pos_left = "0"),
