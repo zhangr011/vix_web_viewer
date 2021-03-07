@@ -85,7 +85,8 @@ def line(df, rets_vix, rets_gvzm, rets_ovxm):
                 yaxis_opts = opts.AxisOpts(
                     is_scale = True, splitline_opts=opts.SplitLineOpts(is_show=True)
                 ),
-                tooltip_opts=opts.TooltipOpts(trigger="axis", axis_pointer_type="line"),
+                tooltip_opts = opts.TooltipOpts(trigger = "axis", axis_pointer_type = "line"),
+                datazoom_opts = opts.DataZoomOpts(type_ = "slider", range_start = 0, range_end = 100),
             ))
     return line
 
