@@ -27,10 +27,11 @@ def get_vix_info():
 
 
 #----------------------------------------------------------------------
-def line(df, rets_vix, rets_gvzm, rets_ovxm):
+def line(delivery_dates, df, rets_vix, rets_gvzm, rets_ovxm):
     # line the vix
     FLINE_OPT = opts.LineStyleOpts(opacity = 1, width = 1.5)
     OLINE_OPT = opts.LineStyleOpts(opacity = 0.9, width = 1.2, type_ = 'dashed')
+    df['delivery'] = [10 + 5 * (idx in delivery_dates) for idx in df.index]
     line = (Line()
             .add_xaxis(xaxis_data = df.index)
             .add_yaxis("vix", df[0], is_symbol_show = False,
@@ -40,8 +41,7 @@ def line(df, rets_vix, rets_gvzm, rets_ovxm):
                            data = [
                                opts.MarkLineItem(type_ = "min", name = "ivl"),
                                opts.MarkLineItem(type_ = "max", name = "ivh"),
-                           ]
-                       ))
+                           ]))
             .add_yaxis('gvz', rets_gvzm['gvz'][CLOSE_PRICE_NAME],
                        is_symbol_show = False, linestyle_opts = FLINE_OPT,
                        markline_opts = opts.MarkLineOpts(
@@ -56,8 +56,7 @@ def line(df, rets_vix, rets_gvzm, rets_ovxm):
                            data = [
                                opts.MarkLineItem(type_ = "min", name = "ivl"),
                                opts.MarkLineItem(type_ = "max", name = "ivh"),
-                           ])
-            )
+                           ]))
             .add_yaxis("1", df[1], is_symbol_show = False,
                        linestyle_opts = OLINE_OPT)
             .add_yaxis("2", df[2], is_symbol_show = False,
@@ -67,10 +66,12 @@ def line(df, rets_vix, rets_gvzm, rets_ovxm):
             .add_yaxis("4", df[4], is_symbol_show = False,
                        linestyle_opts = OLINE_OPT, is_selected = False)
             .add_yaxis("5", df[5], is_symbol_show = False,
-                       linestyle_opts = OLINE_OPT
-            ).set_series_opts(
-                label_opts = opts.LabelOpts(is_show = False)
-            ).set_global_opts(
+                       linestyle_opts = OLINE_OPT)
+            # add delivery date mark, not a good idea, but worked.
+            .add_yaxis("delivery", df['delivery'], is_symbol_show = False, is_step = True)
+            .set_series_opts(
+                label_opts = opts.LabelOpts(is_show = False))
+            .set_global_opts(
                 title_opts = opts.TitleOpts(title = "vix", pos_left = "0"),
                 xaxis_opts = opts.AxisOpts(
                     type_ = "category",
@@ -99,5 +100,5 @@ def get_template():
 #----------------------------------------------------------------------
 def get_data():
     df, delivery_dates, rets_vix, rets_gvzm, rets_ovxm = get_vix_info()
-    chart = line(df, rets_vix, rets_gvzm, rets_ovxm)
+    chart = line(delivery_dates, df, rets_vix, rets_gvzm, rets_ovxm)
     return chart.dump_options_with_quotes()
