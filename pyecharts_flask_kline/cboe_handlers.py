@@ -15,19 +15,26 @@ from cboe_monitor.utilities import run_over_time_frame, CLOSE_PRICE_NAME
 @lru_cache
 def get_vix_info():
     # query data from the data manager
+    # param date is for lru_cache only
     delivery_dates, schedule_days = run_over_time_frame()
     vdm = VIXDataManager(delivery_dates)
-    df = vdm.combine_all()
+    df = vdm.combine_all(24)
     rets_vix = vdm.analyze()
     gvzm = GVZDataManager([])
     rets_gvzm = gvzm.analyze()
     ovxm = OVXDataManager([])
     rets_ovxm = ovxm.analyze()
-    return df, delivery_dates, rets_vix, rets_gvzm, rets_ovxm
+    df_gvz = rets_gvzm['gvz'][[CLOSE_PRICE_NAME]]
+    df_gvz.rename({CLOSE_PRICE_NAME : 'gvz'}, axis = 1, inplace = True)
+    df_ovx = rets_ovxm['ovx'][[CLOSE_PRICE_NAME]]
+    df_ovx.rename({CLOSE_PRICE_NAME : 'ovx'}, axis = 1, inplace = True)
+    df = df.join(df_gvz)
+    df = df.join(df_ovx)
+    return df
 
 
 #----------------------------------------------------------------------
-def line(delivery_dates, df, rets_vix, rets_gvzm, rets_ovxm):
+def line(delivery_dates, df):
     # line the vix
     FLINE_OPT = opts.LineStyleOpts(opacity = 1, width = 1.5)
     OLINE_OPT = opts.LineStyleOpts(opacity = 0.9, width = 1.2, type_ = 'dashed')
@@ -42,7 +49,7 @@ def line(delivery_dates, df, rets_vix, rets_gvzm, rets_ovxm):
                                opts.MarkLineItem(type_ = "min", name = "ivl"),
                                opts.MarkLineItem(type_ = "max", name = "ivh"),
                            ]))
-            .add_yaxis('gvz', rets_gvzm['gvz'][CLOSE_PRICE_NAME],
+            .add_yaxis('gvz', df['gvz'],
                        is_symbol_show = False, linestyle_opts = FLINE_OPT,
                        markline_opts = opts.MarkLineOpts(
                            data = [
@@ -50,8 +57,9 @@ def line(delivery_dates, df, rets_vix, rets_gvzm, rets_ovxm):
                                opts.MarkLineItem(type_ = "max", name = "ivh"),
                            ]
                        ))
-            .add_yaxis('ovx', rets_ovxm['ovx'][CLOSE_PRICE_NAME],
+            .add_yaxis('ovx', df['ovx'],
                        is_symbol_show = False, linestyle_opts = FLINE_OPT,
+                       is_selected = False,
                        markline_opts = opts.MarkLineOpts(
                            data = [
                                opts.MarkLineItem(type_ = "min", name = "ivl"),
@@ -87,7 +95,7 @@ def line(delivery_dates, df, rets_vix, rets_gvzm, rets_ovxm):
                     is_scale = True, splitline_opts=opts.SplitLineOpts(is_show=True)
                 ),
                 tooltip_opts = opts.TooltipOpts(trigger = "axis", axis_pointer_type = "line"),
-                datazoom_opts = opts.DataZoomOpts(type_ = "slider", range_start = 0, range_end = 100),
+                datazoom_opts = opts.DataZoomOpts(type_ = "slider", range_start = 50, range_end = 100),
             ))
     return line
 
@@ -99,6 +107,7 @@ def get_template():
 
 #----------------------------------------------------------------------
 def get_data():
-    df, delivery_dates, rets_vix, rets_gvzm, rets_ovxm = get_vix_info()
-    chart = line(delivery_dates, df, rets_vix, rets_gvzm, rets_ovxm)
+    delivery_dates, schedule_days = run_over_time_frame()
+    df = get_vix_info()
+    chart = line(delivery_dates, df)
     return chart.dump_options_with_quotes()
