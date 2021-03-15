@@ -11,7 +11,8 @@ from flask import render_template
 from options_monitor.data_manager import SIVManager
 from options_monitor.data_ref import \
     PRODUCT_GROUP_NAME, FUTURE_HV_NAMES_REVERSE, \
-    IV_NAME, OPEN_INTEREST_NAME, HV_20_NAME, HV_250_NAME, CLOSE_PRICE_NAME, VOLUME_NAME
+    IV_NAME, IV_PER, OPEN_INTEREST_NAME, HV_20_NAME, HV_250_NAME, \
+    CLOSE_PRICE_NAME, VOLUME_NAME
 
 
 import pandas as pd
@@ -152,6 +153,50 @@ def kline_chart(data: pd.DataFrame, product: str):
         )
     )
 
+    ivp_line = (
+        Line(init_opts = opts.InitOpts())
+        .add_xaxis(xaxis_data = dates)
+        .add_yaxis(
+            series_name = "ivp",
+            y_axis = data[IV_PER],
+            yaxis_index = 1,
+            # is_smooth=True,
+            linestyle_opts = opts.LineStyleOpts(
+                opacity = 1,
+                width = 1.2,
+                color = {'type' : 'linear',
+                         'x' : 0,
+                         'y' : 0,
+                         'x2' : 0,
+                         'y2' : 1,
+                         'colorStops' : [
+                             {'offset' : 0, 'color' : 'red'},
+                             {'offset' : 0.15, 'color' : 'red'},
+                             {'offset' : 0.16, 'color' : 'cyan'},
+                             {'offset' : 0.9, 'color' : 'cyan'},
+                             {'offset' : 0.91, 'color' : 'red'},
+                         ]}),
+            label_opts = opts.LabelOpts(is_show = False),
+        )
+        .set_global_opts(
+            xaxis_opts=opts.AxisOpts(
+                type_="category",
+                grid_index=1,
+                axislabel_opts = opts.LabelOpts(is_show = False),
+            ),
+            yaxis_opts=opts.AxisOpts(
+                grid_index = 1,
+                split_number = 4,
+                # position = "right",
+                axisline_opts=opts.AxisLineOpts(is_on_zero=False),
+                axistick_opts=opts.AxisTickOpts(is_show=False),
+                axislabel_opts=opts.LabelOpts(is_show=True),
+                splitline_opts = opts.SplitLineOpts(is_show = False),
+            ),
+            legend_opts = opts.LegendOpts(is_show = False),
+        )
+    )
+
     # options' volume / futures' open interest
     oi = []
     try:
@@ -178,7 +223,7 @@ def kline_chart(data: pd.DataFrame, product: str):
         )
     )
 
-    # K线图和 MA5 的折线图
+    # K线图和 siv 图
     pos_left_str = "3%"
     pos_right_str = "5%"
     grid_chart.add(
@@ -187,6 +232,9 @@ def kline_chart(data: pd.DataFrame, product: str):
     ).add(
         siv_line,
         grid_opts = opts.GridOpts(pos_left = pos_left_str, pos_right = pos_right_str, height = "70%"),
+    ).add(
+        ivp_line,
+        grid_opts = opts.GridOpts(pos_left = pos_left_str, pos_right = pos_right_str, pos_bottom = "3%", height = "15%"),
     ).add(
         bar_1,
         grid_opts = opts.GridOpts(
