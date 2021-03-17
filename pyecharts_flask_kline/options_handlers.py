@@ -69,6 +69,7 @@ def kline_chart(data: pd.DataFrame, product: str):
         .extend_axis(
             yaxis = opts.AxisOpts(
                 is_show = False,
+                is_scale = False,
                 min_ = 0,
                 max_ = 500,
             ),
@@ -107,6 +108,11 @@ def kline_chart(data: pd.DataFrame, product: str):
         )
     )
 
+    # mark the ivp min and max, so that the linear color worked
+    ivp = data[IV_PER]
+    ivp[0] = 0
+    ivp[2] = 99
+
     siv_line = (
         Line(init_opts = opts.InitOpts())
         .add_xaxis(xaxis_data = dates)
@@ -142,7 +148,7 @@ def kline_chart(data: pd.DataFrame, product: str):
         )
         .add_yaxis(
             series_name = "ivp",
-            y_axis = data[IV_PER],
+            y_axis = ivp,
             yaxis_index = 2,
             # is_smooth=True,
             linestyle_opts = opts.LineStyleOpts(
@@ -157,8 +163,9 @@ def kline_chart(data: pd.DataFrame, product: str):
                              {'offset' : 0, 'color' : 'red'},
                              {'offset' : 0.15, 'color' : 'red'},
                              {'offset' : 0.16, 'color' : 'cyan'},
-                             {'offset' : 0.9, 'color' : 'cyan'},
-                             {'offset' : 0.91, 'color' : 'red'},
+                             {'offset' : 0.91, 'color' : 'cyan'},
+                             {'offset' : 0.92, 'color' : 'red'},
+                             {'offset' : 1, 'color' : 'red'},
                          ]}),
             label_opts = opts.LabelOpts(is_show = False),
         )
