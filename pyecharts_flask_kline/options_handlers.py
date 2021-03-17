@@ -113,6 +113,10 @@ def kline_chart(data: pd.DataFrame, product: str):
     ivp[0] = 0
     ivp[2] = 99
 
+    hv_show = True
+    if not data[IV_NAME].isnull().all():
+        hv_show = False
+
     siv_line = (
         Line(init_opts = opts.InitOpts())
         .add_xaxis(xaxis_data = dates)
@@ -120,6 +124,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             series_name = "siv",
             y_axis = data[IV_NAME] * 100,
             yaxis_index = 1,
+            is_symbol_show = False,
             # is_smooth=True,
             markline_opts = opts.MarkLineOpts(
                 data = [
@@ -134,6 +139,8 @@ def kline_chart(data: pd.DataFrame, product: str):
             series_name = "hv20",
             y_axis = data[HV_20_NAME] * 100,
             yaxis_index = 1,
+            is_symbol_show = False,
+            is_selected = hv_show,
             # is_smooth=True,
             linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2),
             label_opts = opts.LabelOpts(is_show = False),
@@ -142,6 +149,8 @@ def kline_chart(data: pd.DataFrame, product: str):
             series_name = "hv250",
             y_axis = data[HV_250_NAME] * 100,
             yaxis_index = 1,
+            is_symbol_show = False,
+            is_selected = hv_show,
             # is_smooth=True,
             linestyle_opts = opts.LineStyleOpts(opacity = 0.8, width = 1),
             label_opts = opts.LabelOpts(is_show = False),
@@ -150,6 +159,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             series_name = "ivp",
             y_axis = ivp,
             yaxis_index = 2,
+            is_symbol_show = False,
             # is_smooth=True,
             linestyle_opts = opts.LineStyleOpts(
                 opacity = 1,
