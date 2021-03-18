@@ -108,10 +108,11 @@ def kline_chart(data: pd.DataFrame, product: str):
         )
     )
 
-    # mark the ivp min and max, so that the linear color worked
+    # two lines to show ivp, normal ivp with cyan, warn vip for red.
     ivp = data[IV_PER]
-    ivp[0] = 0
-    ivp[2] = 99
+    ivp_shift_left = ivp.shift(-1)
+    data['ivp_warn'] = data[IV_PER][(ivp >= 91) | (ivp <= 15) |
+                                    (ivp_shift_left >= 91) | (ivp_shift_left <= 15)]
 
     hv_show = True
     if not data[IV_NAME].isnull().all():
@@ -164,19 +165,19 @@ def kline_chart(data: pd.DataFrame, product: str):
             linestyle_opts = opts.LineStyleOpts(
                 opacity = 1,
                 width = 1.2,
-                color = {'type' : 'linear',
-                         'x' : 0,
-                         'y' : 0,
-                         'x2' : 0,
-                         'y2' : 1,
-                         'colorStops' : [
-                             {'offset' : 0, 'color' : 'red'},
-                             {'offset' : 0.15, 'color' : 'red'},
-                             {'offset' : 0.16, 'color' : 'cyan'},
-                             {'offset' : 0.91, 'color' : 'cyan'},
-                             {'offset' : 0.92, 'color' : 'red'},
-                             {'offset' : 1, 'color' : 'red'},
-                         ]}),
+                color = 'cyan'),
+            label_opts = opts.LabelOpts(is_show = False),
+        )
+        .add_yaxis(
+            series_name = "ivp_warn",
+            y_axis = data['ivp_warn'],
+            yaxis_index = 2,
+            is_symbol_show = False,
+            linestyle_opts = opts.LineStyleOpts(
+                opacity = 1,
+                width = 1.2,
+                color = 'red'),
+            # is_smooth=True,
             label_opts = opts.LabelOpts(is_show = False),
         )
     )
