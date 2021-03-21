@@ -16,7 +16,7 @@
         <script>
          $(
              function () {
-                 var chart = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});
+                 var chart = echarts.init(document.getElementById('bar'), 'dark', {renderer: 'canvas'});
                  $.ajax({
                      type: "GET",
                      url: "/siv/{{product}}/{{date}}",

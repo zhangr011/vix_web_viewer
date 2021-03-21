@@ -86,7 +86,7 @@ def line(delivery_dates, df):
                        ))
             .add_yaxis('ovx', df['ovx'],
                        is_symbol_show = False, linestyle_opts = FLINE_OPT,
-                       is_selected = False,
+                       # is_selected = False,
                        markline_opts = opts.MarkLineOpts(
                            data = [
                                opts.MarkLineItem(type_ = "min", name = "ivl"),

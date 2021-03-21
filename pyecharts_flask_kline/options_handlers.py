@@ -17,7 +17,7 @@ from options_monitor.data_ref import \
 
 import pandas as pd
 
-THEME_ME = ThemeType.WHITE
+THEME_ME = ThemeType.DARK
 
 
 #----------------------------------------------------------------------
