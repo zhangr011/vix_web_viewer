@@ -161,7 +161,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             is_symbol_show = False,
             is_selected = hv_show,
             # is_smooth=True,
-            linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2, color = 'black'),
+            linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2),
             label_opts = opts.LabelOpts(is_show = False),
         )
         .add_yaxis(
