@@ -133,7 +133,25 @@ def kline_chart(data: pd.DataFrame, product: str):
                     opts.MarkLineItem(type_ = "max", name = "ivh"),
                 ]
             ),
-            linestyle_opts = opts.LineStyleOpts(opacity = 1, width = 2),
+            linestyle_opts = opts.LineStyleOpts(opacity = 1, width = 1.5),
+            label_opts = opts.LabelOpts(is_show = False),
+        )
+        .add_yaxis(
+            series_name = "siv5",
+            y_axis = data[IV_NAME].rolling(5).mean() * 100,
+            yaxis_index = 1,
+            is_symbol_show = False,
+            # is_smooth=True,
+            linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2, color = 'gold'),
+            label_opts = opts.LabelOpts(is_show = False),
+        )
+        .add_yaxis(
+            series_name = "siv10",
+            y_axis = data[IV_NAME].rolling(10).mean() * 100,
+            yaxis_index = 1,
+            is_symbol_show = False,
+            # is_smooth=True,
+            linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2, color = 'cyan'),
             label_opts = opts.LabelOpts(is_show = False),
         )
         .add_yaxis(
@@ -143,7 +161,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             is_symbol_show = False,
             is_selected = hv_show,
             # is_smooth=True,
-            linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2),
+            linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2, color = 'black'),
             label_opts = opts.LabelOpts(is_show = False),
         )
         .add_yaxis(
