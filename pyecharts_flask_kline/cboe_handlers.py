@@ -59,6 +59,7 @@ def get_warning_areas(df):
         areas.append((start, last_date))
     return areas
 
+
 #----------------------------------------------------------------------
 def line(delivery_dates, df):
     # line the vix
@@ -77,7 +78,8 @@ def line(delivery_dates, df):
                                opts.MarkLineItem(type_ = "max", name = "ivh"),
                            ]))
             .add_yaxis('gvz', df['gvz'],
-                       is_symbol_show = False, linestyle_opts = FLINE_OPT,
+                       is_symbol_show = False,
+                       linestyle_opts = opts.LineStyleOpts(opacity = 1, width = 1.5, color = 'gold'),
                        markline_opts = opts.MarkLineOpts(
                            data = [
                                opts.MarkLineItem(type_ = "min", name = "ivl"),
