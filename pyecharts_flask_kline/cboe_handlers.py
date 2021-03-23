@@ -67,11 +67,14 @@ def line(delivery_dates, df):
     OLINE_OPT = opts.LineStyleOpts(opacity = 0.9, width = 1.2, type_ = 'dashed')
     df['delivery'] = [10 + 5 * (idx in delivery_dates) for idx in df.index]
     warning_areas = get_warning_areas(df)
+    # there is a bug in pyecharts, the colors are reversed
+    # line.colors = ['crimson', 'gold', 'green', 'fuchsia', 'orchid', 'plum']
     line = (Line()
             .add_xaxis(xaxis_data = df.index)
             .add_yaxis("vix", df[0], is_symbol_show = False,
                        areastyle_opts = opts.AreaStyleOpts(opacity = 0.2),
                        linestyle_opts = FLINE_OPT,
+                       color = 'powderblue',
                        markline_opts = opts.MarkLineOpts(
                            data = [
                                opts.MarkLineItem(type_ = "min", name = "ivl"),
@@ -79,7 +82,8 @@ def line(delivery_dates, df):
                            ]))
             .add_yaxis('gvz', df['gvz'],
                        is_symbol_show = False,
-                       linestyle_opts = opts.LineStyleOpts(opacity = 1, width = 1.5, color = 'gold'),
+                       linestyle_opts = FLINE_OPT,
+                       color = 'olive',
                        markline_opts = opts.MarkLineOpts(
                            data = [
                                opts.MarkLineItem(type_ = "min", name = "ivl"),
@@ -88,24 +92,25 @@ def line(delivery_dates, df):
                        ))
             .add_yaxis('ovx', df['ovx'],
                        is_symbol_show = False, linestyle_opts = FLINE_OPT,
+                       color = 'tan',
                        # is_selected = False,
                        markline_opts = opts.MarkLineOpts(
                            data = [
                                opts.MarkLineItem(type_ = "min", name = "ivl"),
                                opts.MarkLineItem(type_ = "max", name = "ivh"),
                            ]))
-            .add_yaxis("1", df[1], is_symbol_show = False,
+            .add_yaxis("1", df[1], is_symbol_show = False, color = 'plum',
                        linestyle_opts = OLINE_OPT)
-            .add_yaxis("2", df[2], is_symbol_show = False,
+            .add_yaxis("2", df[2], is_symbol_show = False, color = 'orchid',
                        linestyle_opts = OLINE_OPT, is_selected = False)
-            .add_yaxis("3", df[3], is_symbol_show = False,
+            .add_yaxis("3", df[3], is_symbol_show = False, color = 'fuchsia',
                        linestyle_opts = OLINE_OPT)
-            .add_yaxis("4", df[4], is_symbol_show = False,
+            .add_yaxis("4", df[4], is_symbol_show = False, color = 'green',
                        linestyle_opts = OLINE_OPT, is_selected = False)
-            .add_yaxis("5", df[5], is_symbol_show = False,
+            .add_yaxis("5", df[5], is_symbol_show = False, color = 'gold',
                        linestyle_opts = OLINE_OPT)
             # add delivery date mark, not a good idea, but worked.
-            .add_yaxis("delivery", df['delivery'], is_symbol_show = False, is_step = True)
+            .add_yaxis("delivery", df['delivery'], is_symbol_show = False, color = 'crimson', is_step = True)
             .set_series_opts(
                 label_opts = opts.LabelOpts(is_show = False),
                 markarea_opts = opts.MarkAreaOpts(
