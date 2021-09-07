@@ -2,6 +2,7 @@
 /logs
 flask.out
 flask_monitor.pid
+*.html
 /pyecharts_flask_kline/logs/
 /pyecharts_flask_kline/data/
 __pycache__

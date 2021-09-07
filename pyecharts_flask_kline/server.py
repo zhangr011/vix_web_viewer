@@ -26,6 +26,10 @@ import cboe_handlers
 app = Flask(__name__, static_folder="templates")
 
 
+@app.route("/uploads/options/<date_str>")
+def options_table(date_str: str):
+    return app.send_static_file(date_str)
+
 @app.route("/<product>/<date_str>")
 def options(product: str, date_str: str):
     return options_handlers.get_template(product, date_str)
