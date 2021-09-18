@@ -11,7 +11,8 @@ from flask import render_template
 from options_monitor.data_manager import SIVManager
 from options_monitor.data_ref import \
     PRODUCT_GROUP_NAME, FUTURE_HV_NAMES_REVERSE, \
-    IV_NAME, IV_PER, OPEN_INTEREST_NAME, HV_20_NAME, HV_250_NAME, \
+    IV_NAME, IV_C_NAME, IV_P_NAME, IV_PER, \
+    OPEN_INTEREST_NAME, HV_20_NAME, HV_250_NAME, \
     CLOSE_PRICE_NAME, VOLUME_NAME
 
 
@@ -57,6 +58,8 @@ def kline_chart(data: pd.DataFrame, product: str):
     if not data[IV_NAME].isnull().all():
         hv_show = False
 
+    OLINE_STYLE = opts.LineStyleOpts(opacity = 0.5, width = 1)
+
     kline = (
         Line(init_opts = opts.InitOpts())
         .add_xaxis(xaxis_data = dates)
@@ -89,23 +92,27 @@ def kline_chart(data: pd.DataFrame, product: str):
             label_opts = opts.LabelOpts(is_show = False),
         )
         .add_yaxis(
-            series_name = "siv5",
-            y_axis = data[IV_NAME].rolling(5).mean() * 100,
+            series_name = "siv_c",
+            # y_axis = data[IV_NAME].rolling(5).mean() * 100,
+            y_axis = data[IV_C_NAME] * 100,
             yaxis_index = 1,
             is_symbol_show = False,
+            is_selected = False,
             # is_smooth=True,
             color = colors[5],
-            linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2),
+            linestyle_opts = OLINE_STYLE,
             label_opts = opts.LabelOpts(is_show = False),
         )
         .add_yaxis(
-            series_name = "siv10",
-            y_axis = data[IV_NAME].rolling(10).mean() * 100,
+            series_name = "siv_p",
+            # y_axis = data[IV_NAME].rolling(10).mean() * 100,
+            y_axis = data[IV_P_NAME] * 100,
             yaxis_index = 1,
             is_symbol_show = False,
+            is_selected = False,
             # is_smooth=True,
             color = colors[4],
-            linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2),
+            linestyle_opts = OLINE_STYLE,
             label_opts = opts.LabelOpts(is_show = False),
         )
         .add_yaxis(
