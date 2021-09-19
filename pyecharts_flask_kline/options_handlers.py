@@ -6,6 +6,7 @@ from pyecharts import options as opts
 from pyecharts.charts import Kline, Line, Bar, Grid, Tab
 from pyecharts.globals import ThemeType
 from flask import render_template
+import talib
 
 
 from options_monitor.data_manager import SIVManager
@@ -22,7 +23,7 @@ THEME_ME = ThemeType.DARK
 
 
 #----------------------------------------------------------------------
-@lru_cache
+@lru_cache(maxsize = 2)
 def get_siv_info(now_date_str: str):
     """analyze"""
     siv_mgr = SIVManager()
@@ -58,7 +59,12 @@ def kline_chart(data: pd.DataFrame, product: str):
     if not data[IV_NAME].isnull().all():
         hv_show = False
 
-    OLINE_STYLE = opts.LineStyleOpts(opacity = 0.5, width = 1)
+    OLINE_STYLE = opts.LineStyleOpts(opacity = 0.8, width = 1.2)
+
+    upper, middle, lower = talib.BBANDS(data[CLOSE_PRICE_NAME],
+                                        timeperiod = 26,
+                                        nbdevup = 2.5,
+                                        nbdevdn = 2.5)
 
     kline = (
         Line(init_opts = opts.InitOpts())
@@ -92,29 +98,53 @@ def kline_chart(data: pd.DataFrame, product: str):
             label_opts = opts.LabelOpts(is_show = False),
         )
         .add_yaxis(
-            series_name = "siv_c",
-            # y_axis = data[IV_NAME].rolling(5).mean() * 100,
-            y_axis = data[IV_C_NAME] * 100,
-            yaxis_index = 1,
+            series_name = "k26",
+            y_axis = middle,
             is_symbol_show = False,
-            is_selected = False,
-            # is_smooth=True,
             color = colors[5],
             linestyle_opts = OLINE_STYLE,
-            label_opts = opts.LabelOpts(is_show = False),
+            label_opts = opts.LabelOpts(is_show = False)
         )
         .add_yaxis(
-            series_name = "siv_p",
-            # y_axis = data[IV_NAME].rolling(10).mean() * 100,
-            y_axis = data[IV_P_NAME] * 100,
-            yaxis_index = 1,
+            series_name = "upper",
+            y_axis = upper,
             is_symbol_show = False,
-            is_selected = False,
-            # is_smooth=True,
             color = colors[4],
             linestyle_opts = OLINE_STYLE,
-            label_opts = opts.LabelOpts(is_show = False),
+            label_opts = opts.LabelOpts(is_show = False)
         )
+        .add_yaxis(
+            series_name = "lower",
+            y_axis = lower,
+            is_symbol_show = False,
+            color = colors[3],
+            linestyle_opts = OLINE_STYLE,
+            label_opts = opts.LabelOpts(is_show = False)
+        )
+        # .add_yaxis(
+        #     series_name = "siv_c",
+        #     # y_axis = data[IV_NAME].rolling(5).mean() * 100,
+        #     y_axis = data[IV_C_NAME] * 100,
+        #     yaxis_index = 1,
+        #     is_symbol_show = False,
+        #     is_selected = False,
+        #     # is_smooth=True,
+        #     color = colors[5],
+        #     linestyle_opts = OLINE_STYLE,
+        #     label_opts = opts.LabelOpts(is_show = False),
+        # )
+        # .add_yaxis(
+        #     series_name = "siv_p",
+        #     # y_axis = data[IV_NAME].rolling(10).mean() * 100,
+        #     y_axis = data[IV_P_NAME] * 100,
+        #     yaxis_index = 1,
+        #     is_symbol_show = False,
+        #     is_selected = False,
+        #     # is_smooth=True,
+        #     color = colors[4],
+        #     linestyle_opts = OLINE_STYLE,
+        #     label_opts = opts.LabelOpts(is_show = False),
+        # )
         .add_yaxis(
             series_name = "hv20",
             y_axis = data[HV_20_NAME] * 100,
