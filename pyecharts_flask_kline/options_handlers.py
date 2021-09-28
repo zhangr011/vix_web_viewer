@@ -12,9 +12,9 @@ import talib
 from options_monitor.data_manager import SIVManager
 from options_monitor.data_ref import \
     PRODUCT_GROUP_NAME, FUTURE_HV_NAMES_REVERSE, \
-    IV_NAME, IV_C_NAME, IV_P_NAME, IV_PER, \
+    IV_NAME, IV_C_NAME, IV_P_NAME, IV_T_NAME, IV_PER, \
     OPEN_INTEREST_NAME, HV_20_NAME, HV_250_NAME, \
-    CLOSE_PRICE_NAME, VOLUME_NAME
+    CLOSE_PRICE_NAME, VOLUME_NAME, TURNOVER_NAME
 
 
 import pandas as pd
@@ -47,7 +47,7 @@ def kline_chart(data: pd.DataFrame, product: str):
     grid_chart = Grid(init_opts = opts.InitOpts(theme = THEME_ME))
     dates = data.index.to_list()
 
-    colors = ['ivory', 'crimson', 'gold', 'cyan', 'teal', 'tan', 'cyan', 'red']
+    colors = ['ivory', 'crimson', 'gold', 'cyan', 'teal', 'tan', 'white', 'cyan', 'red', 'lime']
 
     # two lines to show ivp, normal ivp with cyan, warn vip for red.
     ivp = data[IV_PER]
@@ -72,7 +72,7 @@ def kline_chart(data: pd.DataFrame, product: str):
         .add_yaxis(
             series_name = "kline",
             y_axis = data[CLOSE_PRICE_NAME],
-            color = colors[7],
+            color = colors[9],
             linestyle_opts = opts.LineStyleOpts(opacity = 1, width = 2.),
             markline_opts = opts.MarkLineOpts(
                 data = [
@@ -87,7 +87,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             yaxis_index = 1,
             is_symbol_show = False,
             # is_smooth=True,
-            color = colors[6],
+            color = colors[8],
             markline_opts = opts.MarkLineOpts(
                 data = [
                     opts.MarkLineItem(type_ = "min", name = "ivl"),
@@ -101,7 +101,8 @@ def kline_chart(data: pd.DataFrame, product: str):
             series_name = "k26",
             y_axis = middle,
             is_symbol_show = False,
-            color = colors[5],
+            is_selected = False,
+            color = colors[7],
             linestyle_opts = OLINE_STYLE,
             label_opts = opts.LabelOpts(is_show = False)
         )
@@ -109,7 +110,8 @@ def kline_chart(data: pd.DataFrame, product: str):
             series_name = "upper",
             y_axis = upper,
             is_symbol_show = False,
-            color = colors[4],
+            is_selected = False,
+            color = colors[6],
             linestyle_opts = OLINE_STYLE,
             label_opts = opts.LabelOpts(is_show = False)
         )
@@ -117,7 +119,8 @@ def kline_chart(data: pd.DataFrame, product: str):
             series_name = "lower",
             y_axis = lower,
             is_symbol_show = False,
-            color = colors[3],
+            is_selected = False,
+            color = colors[5],
             linestyle_opts = OLINE_STYLE,
             label_opts = opts.LabelOpts(is_show = False)
         )
@@ -152,7 +155,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             is_symbol_show = False,
             is_selected = hv_show,
             # is_smooth=True,
-            color = colors[3],
+            color = colors[4],
             linestyle_opts = opts.LineStyleOpts(opacity = 0.9, width = 1.2),
             label_opts = opts.LabelOpts(is_show = False),
         )
@@ -163,7 +166,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             is_symbol_show = False,
             is_selected = hv_show,
             # is_smooth=True,
-            color = colors[2],
+            color = colors[3],
             linestyle_opts = opts.LineStyleOpts(opacity = 0.8, width = 1),
             label_opts = opts.LabelOpts(is_show = False),
         )
@@ -173,7 +176,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             yaxis_index = 2,
             is_symbol_show = False,
             # is_smooth=True,
-            color = colors[1],
+            color = colors[2],
             linestyle_opts = opts.LineStyleOpts(
                 opacity = 1,
                 width = 1.2),
@@ -184,10 +187,28 @@ def kline_chart(data: pd.DataFrame, product: str):
             y_axis = data['ivp_warn'],
             yaxis_index = 2,
             is_symbol_show = False,
-            color = colors[0],
+            color = colors[1],
             linestyle_opts = opts.LineStyleOpts(
                 opacity = 1,
                 width = 1.2),
+            # is_smooth=True,
+            label_opts = opts.LabelOpts(is_show = False),
+        )
+        .add_yaxis(
+            series_name = "total",
+            y_axis = data[TURNOVER_NAME],
+            yaxis_index = 3,
+            is_symbol_show = False,
+            color = colors[0],
+            markline_opts = opts.MarkLineOpts(
+                data = [
+                    opts.MarkLineItem(type_ = "min", name = "total_l"),
+                    opts.MarkLineItem(type_ = "max", name = "total_h"),
+                ]
+            ),
+            linestyle_opts = opts.LineStyleOpts(
+                opacity = 0.7,
+                width = 0.8),
             # is_smooth=True,
             label_opts = opts.LabelOpts(is_show = False),
         )
@@ -205,6 +226,12 @@ def kline_chart(data: pd.DataFrame, product: str):
                 min_ = 0,
                 max_ = 500,
             ),
+        )
+        .extend_axis(
+            yaxis = opts.AxisOpts(
+                is_show = False,
+                is_scale = True
+            )
         )
         .set_series_opts(
             label_opts = opts.LabelOpts(is_show=False),
