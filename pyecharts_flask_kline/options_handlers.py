@@ -4,7 +4,7 @@ from typing import List, Sequence, Union
 from functools import lru_cache
 from pyecharts import options as opts
 from pyecharts.charts import Kline, Line, Bar, Grid, Tab
-from pyecharts.globals import ThemeType
+from pyecharts.globals import ThemeType, SymbolType
 from flask import render_template
 import talib
 
@@ -15,7 +15,8 @@ from options_monitor.data_ref import \
     IV_NAME, IV_C_NAME, IV_P_NAME, IV_T_NAME, IV_PER, \
     OPEN_INTEREST_NAME, HV_20_NAME, HV_250_NAME, \
     CLOSE_PRICE_NAME, VOLUME_NAME, TURNOVER_NAME, \
-    STATE_NAME, STATE_IN_GAME, STATE_KEEP_WATCHING
+    STATE_NAME, STATE_IN_GAME_UP, STATE_IN_GAME_DOWN, \
+    STATE_KEEP_WATCHING_UP, STATE_KEEP_WATCHING_DOWN
 
 
 import pandas as pd
@@ -67,13 +68,32 @@ def kline_chart(data: pd.DataFrame, product: str):
                                         nbdevup = 2.5,
                                         nbdevdn = 2.5)
     close_data = data[CLOSE_PRICE_NAME]
-    marks_ig = []
-    marks_kw = []
+    marks = []
+
     for idx, row in data.iterrows():
-        if row[STATE_NAME] == STATE_IN_GAME:
-            marks_ig.append(opts.MarkPointItem(coord = [idx, row[CLOSE_PRICE_NAME]], value = row[CLOSE_PRICE_NAME]))
-        elif row[STATE_NAME] == STATE_KEEP_WATCHING:
-            marks_kw.append(opts.MarkPointItem(coord = [idx, row[CLOSE_PRICE_NAME]], value = row[CLOSE_PRICE_NAME]))
+        ssize = 10
+        if row[STATE_NAME] == STATE_IN_GAME_UP:
+            st = SymbolType.ARROW
+            style = opts.ItemStyleOpts(color = 'red')
+            ssize = 15
+        elif row[STATE_NAME] == STATE_IN_GAME_DOWN:
+            st = SymbolType.ROUND_RECT
+            style = opts.ItemStyleOpts(color = 'cyan')
+            ssize = 15
+        elif row[STATE_NAME] == STATE_KEEP_WATCHING_UP:
+            st = SymbolType.TRIANGLE
+            style = opts.ItemStyleOpts(color = 'red')
+        elif row[STATE_NAME] == STATE_KEEP_WATCHING_DOWN:
+            st = SymbolType.DIAMOND
+            style = opts.ItemStyleOpts(color = 'cyan')
+        else:
+            continue
+        # append to marks
+        mi = opts.MarkPointItem(coord = [idx, row[CLOSE_PRICE_NAME]],
+                                symbol = st,
+                                symbol_size = ssize,
+                                itemstyle_opts = style)
+        marks.append(mi)
 
     kline = (
         Line(init_opts = opts.InitOpts())
@@ -89,7 +109,7 @@ def kline_chart(data: pd.DataFrame, product: str):
                     opts.MarkLineItem(type_ = "max", name = "最高价", symbol = 'none'),
                 ]
             ),
-            markpoint_opts=opts.MarkPointOpts(data = marks_ig),
+            markpoint_opts=opts.MarkPointOpts(data = marks),
         )
         .add_yaxis(
             series_name = "siv",
