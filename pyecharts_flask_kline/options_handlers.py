@@ -12,7 +12,7 @@ import talib
 from options_monitor.data_manager import SIVManager
 from options_monitor.data_ref import \
     PRODUCT_GROUP_NAME, FUTURE_HV_NAMES_REVERSE, \
-    IV_NAME, IV_C_NAME, IV_P_NAME, IV_T_NAME, IV_PER, \
+    IV_NAME, IV_C_NAME, IV_P_NAME, IV_T_NAME, IV_PER, TURNOVER_PER, \
     OPEN_INTEREST_NAME, HV_20_NAME, HV_250_NAME, \
     CLOSE_PRICE_NAME, VOLUME_NAME, TURNOVER_NAME, \
     STATE_NAME, STATE_IN_GAME_UP, STATE_IN_GAME_DOWN, \
@@ -49,7 +49,7 @@ def kline_chart(data: pd.DataFrame, product: str):
     grid_chart = Grid(init_opts = opts.InitOpts(theme = THEME_ME))
     dates = data.index.to_list()
 
-    colors = ['ivory', 'crimson', 'gold', 'cyan', 'teal', 'tan', 'white', 'cyan', 'red', 'lime', 'gold', 'magenta']
+    colors = ['ivory', 'crimson', 'gold', 'cyan', 'teal', 'tan', 'white', 'plum', 'cyan', 'red', 'lime', 'gold', 'magenta']
 
     # two lines to show ivp, normal ivp with cyan, warn vip for red.
     ivp = data[IV_PER]
@@ -70,6 +70,12 @@ def kline_chart(data: pd.DataFrame, product: str):
     close_data = data[CLOSE_PRICE_NAME]
     marks = []
 
+    total_c = []
+    total_p = []
+    if IV_C_NAME in data.columns:
+        total_c = data[IV_C_NAME]
+        total_p = data[IV_P_NAME]
+
     for idx, row in data.iterrows():
         ssize = 10
         if row[STATE_NAME] == STATE_IN_GAME_UP:
@@ -81,7 +87,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             style = opts.ItemStyleOpts(color = 'cyan')
             ssize = 15
         elif row[STATE_NAME] == STATE_KEEP_WATCHING_UP:
-            st = SymbolType.TRIANGLE
+            st = SymbolType.DIAMOND
             style = opts.ItemStyleOpts(color = 'red')
         elif row[STATE_NAME] == STATE_KEEP_WATCHING_DOWN:
             st = SymbolType.DIAMOND
@@ -177,12 +183,26 @@ def kline_chart(data: pd.DataFrame, product: str):
             label_opts = opts.LabelOpts(is_show = False),
         )
         .add_yaxis(
+            series_name = "tp",
+            # y_axis = data[IV_NAME].rolling(10).mean() * 100,
+            y_axis = data[TURNOVER_PER],
+            yaxis_index = 2,
+            is_symbol_show = False,
+            is_selected = True,
+            # is_smooth=True,
+            color = colors[-8],
+            linestyle_opts = opts.LineStyleOpts(
+                opacity = 0,
+                width = 0.1),
+            label_opts = opts.LabelOpts(is_show = False),
+        )
+        .add_yaxis(
             series_name = "ivp",
             y_axis = ivp,
             yaxis_index = 2,
             is_symbol_show = False,
             # is_smooth=True,
-            color = colors[-8],
+            color = colors[-9],
             linestyle_opts = opts.LineStyleOpts(
                 opacity = 1,
                 width = 1.2),
@@ -193,7 +213,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             y_axis = data['ivp_warn'],
             yaxis_index = 2,
             is_symbol_show = False,
-            color = colors[-9],
+            color = colors[-10],
             linestyle_opts = opts.LineStyleOpts(
                 opacity = 1,
                 width = 1.2),
@@ -205,7 +225,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             y_axis = data[TURNOVER_NAME],
             yaxis_index = 3,
             is_symbol_show = False,
-            color = colors[-10],
+            color = colors[-11],
             markline_opts = opts.MarkLineOpts(
                 data = [
                     opts.MarkLineItem(type_ = "min", name = "total_l"),
@@ -220,12 +240,12 @@ def kline_chart(data: pd.DataFrame, product: str):
         )
         .add_yaxis(
             series_name = "total_c",
-            y_axis = data[IV_C_NAME],
+            y_axis = total_c,
             yaxis_index = 3,
             is_symbol_show = False,
             is_selected = True,
             # is_smooth=True,
-            color = colors[-11],
+            color = colors[-12],
             linestyle_opts = opts.LineStyleOpts(
                 opacity = 0,
                 width = 0.1),
@@ -234,12 +254,12 @@ def kline_chart(data: pd.DataFrame, product: str):
         .add_yaxis(
             series_name = "total_p",
             # y_axis = data[IV_NAME].rolling(10).mean() * 100,
-            y_axis = data[IV_P_NAME],
+            y_axis = total_p,
             yaxis_index = 3,
             is_symbol_show = False,
             is_selected = True,
             # is_smooth=True,
-            color = colors[-12],
+            color = colors[-13],
             linestyle_opts = opts.LineStyleOpts(
                 opacity = 0,
                 width = 0.1),
