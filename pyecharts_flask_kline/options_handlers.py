@@ -80,7 +80,7 @@ def kline_chart(data: pd.DataFrame, product: str):
         ssize = 10
         if row[STATE_NAME] == STATE_IN_GAME_UP:
             st = SymbolType.ARROW
-            style = opts.ItemStyleOpts(color = 'red')
+            style = opts.ItemStyleOpts(color = 'fuchsia')
             ssize = 15
         elif row[STATE_NAME] == STATE_IN_GAME_DOWN:
             st = SymbolType.ROUND_RECT
@@ -88,7 +88,7 @@ def kline_chart(data: pd.DataFrame, product: str):
             ssize = 15
         elif row[STATE_NAME] == STATE_KEEP_WATCHING_UP:
             st = SymbolType.DIAMOND
-            style = opts.ItemStyleOpts(color = 'red')
+            style = opts.ItemStyleOpts(color = 'fuchsia')
         elif row[STATE_NAME] == STATE_KEEP_WATCHING_DOWN:
             st = SymbolType.DIAMOND
             style = opts.ItemStyleOpts(color = 'cyan')
