@@ -17,6 +17,7 @@ from options_monitor.data_ref import \
     CLOSE_PRICE_NAME, VOLUME_NAME, TURNOVER_NAME, \
     STATE_NAME, STATE_IN_GAME_UP, STATE_IN_GAME_DOWN, \
     STATE_KEEP_WATCHING_UP, STATE_KEEP_WATCHING_DOWN
+from options_monitor.utilities_calendar import get_last_trade_dates
 
 
 import pandas as pd
@@ -25,7 +26,7 @@ THEME_ME = ThemeType.DARK
 
 
 #----------------------------------------------------------------------
-@lru_cache(maxsize = 2)
+@lru_cache(maxsize = 1)
 def get_siv_info(now_date_str: str):
     """analyze"""
     siv_mgr = SIVManager()
@@ -36,11 +37,13 @@ def get_siv_info(now_date_str: str):
 #----------------------------------------------------------------------
 def get_iv_data(product: str, date_str: str):
     """get the iv data by contract and date"""
-    analyze_dfs = get_siv_info(date_str)
+    dates = get_last_trade_dates()
+    now_date_str = dates[-1]
+    analyze_dfs = get_siv_info(now_date_str)
     product_rev = FUTURE_HV_NAMES_REVERSE.get(product)
     for df in analyze_dfs:
         if df[PRODUCT_GROUP_NAME][0] == product_rev:
-            return df[df.index <= date_str]
+            return df[df.index <= now_date_str]
 
 
 #----------------------------------------------------------------------
@@ -65,8 +68,8 @@ def kline_chart(data: pd.DataFrame, product: str):
 
     upper, middle, lower = talib.BBANDS(data[CLOSE_PRICE_NAME],
                                         timeperiod = 26,
-                                        nbdevup = 2.5,
-                                        nbdevdn = 2.5)
+                                        nbdevup = 2,
+                                        nbdevdn = 2)
     close_data = data[CLOSE_PRICE_NAME]
     marks = []
 
