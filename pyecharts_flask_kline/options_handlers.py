@@ -15,7 +15,7 @@ from options_monitor.data_ref import \
     IV_NAME, IV_C_NAME, IV_P_NAME, IV_T_NAME, IV_PER, TURNOVER_PER, \
     OPEN_INTEREST_NAME, HV_20_NAME, HV_250_NAME, \
     CLOSE_PRICE_NAME, VOLUME_NAME, TURNOVER_NAME, \
-    STATE_NAME, STATE_IN_GAME_UP, STATE_IN_GAME_DOWN, \
+    STATE_NAME, VOL_STATE_NAME, STATE_IN_GAME_UP, STATE_IN_GAME_DOWN, \
     STATE_KEEP_WATCHING_UP, STATE_KEEP_WATCHING_DOWN
 from options_monitor.utilities_calendar import get_last_trade_dates
 
@@ -81,6 +81,13 @@ def kline_chart(data: pd.DataFrame, product: str):
 
     for idx, row in data.iterrows():
         ssize = 10
+        if row[VOL_STATE_NAME] == True:
+            mi_vol = opts.MarkPointItem(
+                coord = [idx, row[CLOSE_PRICE_NAME]],
+                symbol = SymbolType.DIAMOND,
+                symbol_size = 15,
+                itemstyle_opts = opts.ItemStyleOpts(color = 'gold'))
+            marks.append(mi_vol)
         if row[STATE_NAME] == STATE_IN_GAME_UP:
             st = SymbolType.ARROW
             style = opts.ItemStyleOpts(color = 'fuchsia')
